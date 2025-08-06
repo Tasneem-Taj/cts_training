@@ -212,13 +212,14 @@ select department,count(name) from employee where age<35 group by department;
 | Marketing  |           1 |
 +------------+-------------+
 U. List top 3 departments with highest total salary.
-select department,sum(salary) from employee group by department order by sum(salary) limit 3;
+select department , sum(salary) from employee group by department order by sum(salary) desc;
 +------------+-------------+
 | department | sum(salary) |
 +------------+-------------+
-| HR         |   153000.00 |
-| Marketing  |   155000.00 |
+| IT         |   356000.00 |
 | Finance    |   241000.00 |
+| Marketing  |   155000.00 |
+| HR         |   153000.00 |
 +------------+-------------+
 V. List departments where all employees have more than 5 years of experience.
 select department,count(name) from employee where experience>5 group by department;
