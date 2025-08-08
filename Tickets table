@@ -1,0 +1,488 @@
+Ticket table
+
+CREATE TABLE tickets (
+    ticket_id INT PRIMARY KEY,
+    customer_name VARCHAR(100),
+    issue_type VARCHAR(50),
+    priority INT,                 -- 1 (Low), 2 (Medium), 3 (High)
+    status VARCHAR(20),          -- Open, Closed, Pending, Escalated
+    created_date DATE,
+    assigned_team VARCHAR(50),   -- Support Team names
+    location VARCHAR(50)         -- City or Branch location
+);
+
+INSERT INTO tickets (ticket_id, customer_name, issue_type, priority, status, created_date, assigned_team, location) VALUES
+(1,  'Alice',   'Network',   3, 'Open',      '2025-08-01', 'Network Team',   'New York'),
+(2,  'Bob',     'Software',  2, 'Closed',    '2025-07-28', 'Software Team',  'Chicago'),
+(3,  'Charlie', 'Hardware',  1, 'Pending',   '2025-08-02', 'Hardware Team',  'San Francisco'),
+(4,  'Diana',   'Network',   2, 'Open',      '2025-08-03', 'Network Team',   'New York'),
+(5,  'Eve',     'Software',  3, 'Closed',    '2025-07-30', 'Software Team',  'Boston'),
+(6,  'Frank',   'Software',  1, 'Pending',   '2025-08-04', 'Software Team',  'Seattle'),
+(7,  'Grace',   'Network',   2, 'Escalated', '2025-08-05', 'Network Team',   'Los Angeles'),
+(8,  'Henry',   'Hardware',  3, 'Open',      '2025-08-01', 'Hardware Team',  'Houston'),
+(9,  'Ivy',     'Network',   1, 'Closed',    '2025-07-29', 'Network Team',   'Chicago'),
+(10, 'Jack',    'Software',  3, 'Open',      '2025-08-06', 'Software Team',  'New York'),
+(11, 'Kate',    'Hardware',  2, 'Pending',   '2025-08-02', 'Hardware Team',  'Boston'),
+(12, 'Leo',     'Software',  2, 'Closed',    '2025-07-31', 'Software Team',  'San Francisco'),
+(13, 'Mona',    'Network',   3, 'Escalated', '2025-08-03', 'Network Team',   'New York'),
+(14, 'Nina',    'Hardware',  1, 'Open',      '2025-08-04', 'Hardware Team',  'Seattle'),
+(15, 'Oscar',   'Software',  3, 'Pending',   '2025-08-01', 'Software Team',  'Los Angeles'),
+(16, 'Paul',    'Network',   2, 'Closed',    '2025-07-30', 'Network Team',   'Houston'),
+(17, 'Queen',   'Hardware',  1, 'Pending',   '2025-08-05', 'Hardware Team',  'New York'),
+(18, 'Rita',    'Software',  2, 'Open',      '2025-08-06', 'Software Team',  'Chicago'),
+(19, 'Sam',     'Network',   3, 'Open',      '2025-08-07', 'Network Team',   'Boston'),
+(20, 'Tina',    'Hardware',  2, 'Escalated', '2025-08-02', 'Hardware Team',  'Seattle');
+
+
+✅ 1. Classify each ticket by urgency based on priority
+•	Priority 3 → 'High'
+•	Priority 2 → 'Medium'
+•	Priority 1 → 'Low'
+select ticket_id,priority,
+    -> case priority
+    -> when '1' then 'low'
+    -> when '2' then 'medium'
+    -> when '3' then 'high'
+    -> end as updated_priority
+    -> from tickets;
++-----------+----------+------------------+
+| ticket_id | priority | updated_priority |
++-----------+----------+------------------+
+|         1 |        3 | high             |
+|         2 |        2 | medium           |
+|         3 |        1 | low              |
+|         4 |        2 | medium           |
+|         5 |        3 | high             |
+|         6 |        1 | low              |
+|         7 |        2 | medium           |
+|         8 |        3 | high             |
+|         9 |        1 | low              |
+|        10 |        3 | high             |
+|        11 |        2 | medium           |
+|        12 |        2 | medium           |
+|        13 |        3 | high             |
+|        14 |        1 | low              |
+|        15 |        3 | high             |
+|        16 |        2 | medium           |
+|        17 |        1 | low              |
+|        18 |        2 | medium           |
+|        19 |        3 | high             |
+|        20 |        2 | medium           |
++-----------+----------+------------------+
+________________________________________
+✅ 2. Add a column to classify ticket status
+•	'Active' if status = 'Open' or 'Escalated'
+•	'Inactive' if status = 'Closed'
+•	'Waiting' otherwise
+select status,
+    -> case status
+    -> when 'open' then 'active'
+    -> when 'escalated' then 'active'
+    -> when 'closed' then 'inactive'
+    -> when 'pending' then 'waiting'
+    -> end as updated_status
+    -> from tickets;
++-----------+----------------+
+| status    | updated_status |
++-----------+----------------+
+| Open      | active         |
+| Closed    | inactive       |
+| Pending   | waiting        |
+| Open      | active         |
+| Closed    | inactive       |
+| Pending   | waiting        |
+| Escalated | active         |
+| Open      | active         |
+| Closed    | inactive       |
+| Open      | active         |
+| Pending   | waiting        |
+| Closed    | inactive       |
+| Escalated | active         |
+| Open      | active         |
+| Pending   | waiting        |
+| Closed    | inactive       |
+| Pending   | waiting        |
+| Open      | active         |
+| Open      | active         |
+| Escalated | active         |
++-----------+----------------+select
+________________________________________
+✅ 3. List tickets and show issue category
+•	'Software Issue', 'Hardware Issue', 'Network Issue', or 'Other'
+select ticket_id,issue_type,
+    -> case issue_type
+    -> when 'network' then 'network issue'
+    -> when 'software' then 'software issue'
+    -> when 'hardware' then 'hardware issue'
+    -> end as updated_issue_type
+    -> from tickets;
++-----------+------------+--------------------+
+| ticket_id | issue_type | updated_issue_type |
++-----------+------------+--------------------+
+|         1 | Network    | network issue      |
+|         2 | Software   | software issue     |
+|         3 | Hardware   | hardware issue     |
+|         4 | Network    | network issue      |
+|         5 | Software   | software issue     |
+|         6 | Software   | software issue     |
+|         7 | Network    | network issue      |
+|         8 | Hardware   | hardware issue     |
+|         9 | Network    | network issue      |
+|        10 | Software   | software issue     |
+|        11 | Hardware   | hardware issue     |
+|        12 | Software   | software issue     |
+|        13 | Network    | network issue      |
+|        14 | Hardware   | hardware issue     |
+|        15 | Software   | software issue     |
+|        16 | Network    | network issue      |
+|        17 | Hardware   | hardware issue     |
+|        18 | Software   | software issue     |
+|        19 | Network    | network issue      |
+|        20 | Hardware   | hardware issue     |
++-----------+------------+--------------------+
+________________________________________
+✅ 4. Mark tickets as "VIP" if customer name starts with A, E, M, or S
+select customer_name,
+    -> case
+    -> when customer_name like 'a%' then 'VIP'
+    -> when customer_name like 'e%' then 'VIP'
+    -> when customer_name like 'm%' then 'VIP'
+    -> when customer_name like 's%' then 'VIP'
+    -> end as updated_Name
+    -> from tickets;
++---------------+--------------+
+| customer_name | updated_Name |
++---------------+--------------+
+| Alice         | VIP          |
+| Bob           | NULL         |
+| Charlie       | NULL         |
+| Diana         | NULL         |
+| Eve           | VIP          |
+| Frank         | NULL         |
+| Grace         | NULL         |
+| Henry         | NULL         |
+| Ivy           | NULL         |
+| Jack          | NULL         |
+| Kate          | NULL         |
+| Leo           | NULL         |
+| Mona          | VIP          |
+| Nina          | NULL         |
+| Oscar         | NULL         |
+| Paul          | NULL         |
+| Queen         | NULL         |
+| Rita          | NULL         |
+| Sam           | VIP          |
+| Tina          | NULL         |
++---------------+--------------+
+________________________________________
+✅ 5. Show ticket summary: "High Priority Open", "Low Priority Closed", or "Other"
+select ticket_id,priority,
+    -> case priority
+    -> when '1' then 'low priority closed'
+    -> when '2' then 'other'
+    -> when '3' then 'high priority open'
+    -> end as updated_priority
+    -> from tickets;
++-----------+----------+---------------------+
+| ticket_id | priority | updated_priority    |
++-----------+----------+---------------------+
+|         1 |        3 | high priority open  |
+|         2 |        2 | other               |
+|         3 |        1 | low priority closed |
+|         4 |        2 | other               |
+|         5 |        3 | high priority open  |
+|         6 |        1 | low priority closed |
+|         7 |        2 | other               |
+|         8 |        3 | high priority open  |
+|         9 |        1 | low priority closed |
+|        10 |        3 | high priority open  |
+|        11 |        2 | other               |
+|        12 |        2 | other               |
+|        13 |        3 | high priority open  |
+|        14 |        1 | low priority closed |
+|        15 |        3 | high priority open  |
+|        16 |        2 | other               |
+|        17 |        1 | low priority closed |
+|        18 |        2 | other               |
+|        19 |        3 | high priority open  |
+|        20 |        2 | other               |
++-----------+----------+---------------------+
+________________________________________
+✅ 6. Mark follow-up required if ticket is pending or priority is high
+select *, case
+    -> when status='pending' and priority='1' then 'follow up'
+    -> end as updated
+    -> from tickets;
++-----------+---------------+------------+----------+-----------+--------------+---------------+---------------+-----------+
+| ticket_id | customer_name | issue_type | priority | status    | created_date | assigned_team | location      | updated   |
++-----------+---------------+------------+----------+-----------+--------------+---------------+---------------+-----------+
+|         1 | Alice         | Network    |        3 | Open      | 2025-08-01   | Network Team  | New York      | NULL      |
+|         2 | Bob           | Software   |        2 | Closed    | 2025-07-28   | Software Team | Chicago       | NULL      |
+|         3 | Charlie       | Hardware   |        1 | Pending   | 2025-08-02   | Hardware Team | San Francisco | follow up |
+|         4 | Diana         | Network    |        2 | Open      | 2025-08-03   | Network Team  | New York      | NULL      |
+|         5 | Eve           | Software   |        3 | Closed    | 2025-07-30   | Software Team | Boston        | NULL      |
+|         6 | Frank         | Software   |        1 | Pending   | 2025-08-04   | Software Team | Seattle       | follow up |
+|         7 | Grace         | Network    |        2 | Escalated | 2025-08-05   | Network Team  | Los Angeles   | NULL      |
+|         8 | Henry         | Hardware   |        3 | Open      | 2025-08-01   | Hardware Team | Houston       | NULL      |
+|         9 | Ivy           | Network    |        1 | Closed    | 2025-07-29   | Network Team  | Chicago       | NULL      |
+|        10 | Jack          | Software   |        3 | Open      | 2025-08-06   | Software Team | New York      | NULL      |
+|        11 | Kate          | Hardware   |        2 | Pending   | 2025-08-02   | Hardware Team | Boston        | NULL      |
+|        12 | Leo           | Software   |        2 | Closed    | 2025-07-31   | Software Team | San Francisco | NULL      |
+|        13 | Mona          | Network    |        3 | Escalated | 2025-08-03   | Network Team  | New York      | NULL      |
+|        14 | Nina          | Hardware   |        1 | Open      | 2025-08-04   | Hardware Team | Seattle       | NULL      |
+|        15 | Oscar         | Software   |        3 | Pending   | 2025-08-01   | Software Team | Los Angeles   | NULL      |
+|        16 | Paul          | Network    |        2 | Closed    | 2025-07-30   | Network Team  | Houston       | NULL      |
+|        17 | Queen         | Hardware   |        1 | Pending   | 2025-08-05   | Hardware Team | New York      | follow up |
+|        18 | Rita          | Software   |        2 | Open      | 2025-08-06   | Software Team | Chicago       | NULL      |
+|        19 | Sam           | Network    |        3 | Open      | 2025-08-07   | Network Team  | Boston        | NULL      |
+|        20 | Tina          | Hardware   |        2 | Escalated | 2025-08-02   | Hardware Team | Seattle       | NULL      |
++-----------+---------------+------------+----------+-----------+--------------+---------------+---------------+-----------+
+________________________________________
+✅ 7. Assign handling group based on issue_type
+________________________________________
+✅ 8. Label cities as "HQ" if in New York or Chicago
+select *,case
+    -> when location='New york' or location='chicago' then 'HQ'
+    -> end as cities
+    -> from tickets;
++-----------+---------------+------------+----------+-----------+--------------+---------------+---------------+--------+
+| ticket_id | customer_name | issue_type | priority | status    | created_date | assigned_team | location      | cities |
++-----------+---------------+------------+----------+-----------+--------------+---------------+---------------+--------+
+|         1 | Alice         | Network    |        3 | Open      | 2025-08-01   | Network Team  | New York      | HQ     |
+|         2 | Bob           | Software   |        2 | Closed    | 2025-07-28   | Software Team | Chicago       | HQ     |
+|         3 | Charlie       | Hardware   |        1 | Pending   | 2025-08-02   | Hardware Team | San Francisco | NULL   |
+|         4 | Diana         | Network    |        2 | Open      | 2025-08-03   | Network Team  | New York      | HQ     |
+|         5 | Eve           | Software   |        3 | Closed    | 2025-07-30   | Software Team | Boston        | NULL   |
+|         6 | Frank         | Software   |        1 | Pending   | 2025-08-04   | Software Team | Seattle       | NULL   |
+|         7 | Grace         | Network    |        2 | Escalated | 2025-08-05   | Network Team  | Los Angeles   | NULL   |
+|         8 | Henry         | Hardware   |        3 | Open      | 2025-08-01   | Hardware Team | Houston       | NULL   |
+|         9 | Ivy           | Network    |        1 | Closed    | 2025-07-29   | Network Team  | Chicago       | HQ     |
+|        10 | Jack          | Software   |        3 | Open      | 2025-08-06   | Software Team | New York      | HQ     |
+|        11 | Kate          | Hardware   |        2 | Pending   | 2025-08-02   | Hardware Team | Boston        | NULL   |
+|        12 | Leo           | Software   |        2 | Closed    | 2025-07-31   | Software Team | San Francisco | NULL   |
+|        13 | Mona          | Network    |        3 | Escalated | 2025-08-03   | Network Team  | New York      | HQ     |
+|        14 | Nina          | Hardware   |        1 | Open      | 2025-08-04   | Hardware Team | Seattle       | NULL   |
+|        15 | Oscar         | Software   |        3 | Pending   | 2025-08-01   | Software Team | Los Angeles   | NULL   |
+|        16 | Paul          | Network    |        2 | Closed    | 2025-07-30   | Network Team  | Houston       | NULL   |
+|        17 | Queen         | Hardware   |        1 | Pending   | 2025-08-05   | Hardware Team | New York      | HQ     |
+|        18 | Rita          | Software   |        2 | Open      | 2025-08-06   | Software Team | Chicago       | HQ     |
+|        19 | Sam           | Network    |        3 | Open      | 2025-08-07   | Network Team  | Boston        | NULL   |
+|        20 | Tina          | Hardware   |        2 | Escalated | 2025-08-02   | Hardware Team | Seattle       | NULL   |
++-----------+---------------+------------+----------+-----------+--------------+---------------+---------------+--------+
+________________________________________
+✅ 9. Sort tickets so 'Escalated' come first, then 'Open', then others
+________________________________________
+✅ 10. Update status to 'Urgent' if priority = 3 and status is 'Open'
+________________________________________
+✅ 11. Show how many tickets fall into each priority label
+________________________________________
+✅ 12. Show a response plan:
+•	Immediate (High + Open)
+•	Scheduled (Medium + Pending)
+•	Escalate (Low + Escalated)
+•	Standard otherwise
+select *,case
+    -> when priority='3' and status='open' then 'immediate'
+    -> when priority='2' and status='pending' then 'scheduled'
+    -> when priority='1' and status='escalated' then 'escalated'
+    -> else 'standard'
+    -> end as response_plan
+    -> from tickets;
++-----------+---------------+------------+----------+-----------+--------------+---------------+---------------+---------------+
+| ticket_id | customer_name | issue_type | priority | status    | created_date | assigned_team | location      | response_plan |
++-----------+---------------+------------+----------+-----------+--------------+---------------+---------------+---------------+
+|         1 | Alice         | Network    |        3 | Open      | 2025-08-01   | Network Team  | New York      | immediate     |
+|         2 | Bob           | Software   |        2 | Closed    | 2025-07-28   | Software Team | Chicago       | standard      |
+|         3 | Charlie       | Hardware   |        1 | Pending   | 2025-08-02   | Hardware Team | San Francisco | standard      |
+|         4 | Diana         | Network    |        2 | Open      | 2025-08-03   | Network Team  | New York      | standard      |
+|         5 | Eve           | Software   |        3 | Closed    | 2025-07-30   | Software Team | Boston        | standard      |
+|         6 | Frank         | Software   |        1 | Pending   | 2025-08-04   | Software Team | Seattle       | standard      |
+|         7 | Grace         | Network    |        2 | Escalated | 2025-08-05   | Network Team  | Los Angeles   | standard      |
+|         8 | Henry         | Hardware   |        3 | Open      | 2025-08-01   | Hardware Team | Houston       | immediate     |
+|         9 | Ivy           | Network    |        1 | Closed    | 2025-07-29   | Network Team  | Chicago       | standard      |
+|        10 | Jack          | Software   |        3 | Open      | 2025-08-06   | Software Team | New York      | immediate     |
+|        11 | Kate          | Hardware   |        2 | Pending   | 2025-08-02   | Hardware Team | Boston        | scheduled     |
+|        12 | Leo           | Software   |        2 | Closed    | 2025-07-31   | Software Team | San Francisco | standard      |
+|        13 | Mona          | Network    |        3 | Escalated | 2025-08-03   | Network Team  | New York      | standard      |
+|        14 | Nina          | Hardware   |        1 | Open      | 2025-08-04   | Hardware Team | Seattle       | standard      |
+|        15 | Oscar         | Software   |        3 | Pending   | 2025-08-01   | Software Team | Los Angeles   | standard      |
+|        16 | Paul          | Network    |        2 | Closed    | 2025-07-30   | Network Team  | Houston       | standard      |
+|        17 | Queen         | Hardware   |        1 | Pending   | 2025-08-05   | Hardware Team | New York      | standard      |
+|        18 | Rita          | Software   |        2 | Open      | 2025-08-06   | Software Team | Chicago       | standard      |
+|        19 | Sam           | Network    |        3 | Open      | 2025-08-07   | Network Team  | Boston        | immediate     |
+|        20 | Tina          | Hardware   |        2 | Escalated | 2025-08-02   | Hardware Team | Seattle       | standard      |
++-----------+---------------+------------+----------+-----------+--------------+---------------+---------------+---------------+
+________________________________________
+✅ 13. Show ticket age category
+•	If created_date is today → 'New'
+•	If more than 7 days ago → 'Old'
+•	Else → 'Recent'
+________________________________________
+✅ 14. Count tickets by assigned team type: Software, Hardware, Network
+select issue_type,count(ticket_id) from tickets group by issue_type;
++------------+------------------+
+| issue_type | count(ticket_id) |
++------------+------------------+
+| Network    |                7 |
+| Software   |                7 |
+| Hardware   |                6 |
++------------+------------------+
+________________________________________
+✅ 15. Create a column with nested CASE:
+•	If Open:
+o	High → 'Critical Open'
+o	Medium → 'Important Open'
+o	Else → 'Minor Open'
+•	Else: 'Not Open'
+select *,case
+    -> when status='open' then
+    -> case
+    -> when priority='3' then 'critically open'
+    -> when priority='2' then 'important open'
+    -> else 'minor open'
+    -> end
+    -> else 'not open'
+    -> end as new
+    -> from tickets;
++-----------+---------------+------------+----------+-----------+--------------+---------------+---------------+-----------------+
+| ticket_id | customer_name | issue_type | priority | status    | created_date | assigned_team | location      | new             |
++-----------+---------------+------------+----------+-----------+--------------+---------------+---------------+-----------------+
+|         1 | Alice         | Network    |        3 | Open      | 2025-08-01   | Network Team  | New York      | critically open |
+|         2 | Bob           | Software   |        2 | Closed    | 2025-07-28   | Software Team | Chicago       | not open        |
+|         3 | Charlie       | Hardware   |        1 | Pending   | 2025-08-02   | Hardware Team | San Francisco | not open        |
+|         4 | Diana         | Network    |        2 | Open      | 2025-08-03   | Network Team  | New York      | important open  |
+|         5 | Eve           | Software   |        3 | Closed    | 2025-07-30   | Software Team | Boston        | not open        |
+|         6 | Frank         | Software   |        1 | Pending   | 2025-08-04   | Software Team | Seattle       | not open        |
+|         7 | Grace         | Network    |        2 | Escalated | 2025-08-05   | Network Team  | Los Angeles   | not open        |
+|         8 | Henry         | Hardware   |        3 | Open      | 2025-08-01   | Hardware Team | Houston       | critically open |
+|         9 | Ivy           | Network    |        1 | Closed    | 2025-07-29   | Network Team  | Chicago       | not open        |
+|        10 | Jack          | Software   |        3 | Open      | 2025-08-06   | Software Team | New York      | critically open |
+|        11 | Kate          | Hardware   |        2 | Pending   | 2025-08-02   | Hardware Team | Boston        | not open        |
+|        12 | Leo           | Software   |        2 | Closed    | 2025-07-31   | Software Team | San Francisco | not open        |
+|        13 | Mona          | Network    |        3 | Escalated | 2025-08-03   | Network Team  | New York      | not open        |
+|        14 | Nina          | Hardware   |        1 | Open      | 2025-08-04   | Hardware Team | Seattle       | minor open      |
+|        15 | Oscar         | Software   |        3 | Pending   | 2025-08-01   | Software Team | Los Angeles   | not open        |
+|        16 | Paul          | Network    |        2 | Closed    | 2025-07-30   | Network Team  | Houston       | not open        |
+|        17 | Queen         | Hardware   |        1 | Pending   | 2025-08-05   | Hardware Team | New York      | not open        |
+|        18 | Rita          | Software   |        2 | Open      | 2025-08-06   | Software Team | Chicago       | important open  |
+|        19 | Sam           | Network    |        3 | Open      | 2025-08-07   | Network Team  | Boston        | critically open |
+|        20 | Tina          | Hardware   |        2 | Escalated | 2025-08-02   | Hardware Team | Seattle       | not open        |
++-----------+---------------+------------+----------+-----------+--------------+---------------+---------------+-----------------+
+________________________________________
+✅ 16. Count number of Open vs. Closed vs. Other tickets
+    
+________________________________________
+from✅ 17. List all tickets and show "Assigned Team Type"
+•	If team contains "Software" → 'SW'
+•	If team contains "Hardware" → 'HW'
+•	If team contains "Network" → 'NW'
+select *,case
+    -> when assigned_team='Software team' then 'SW'
+    -> when assigned_team='Hardware team' then 'HR'
+    -> when assigned_team='Network team' then 'NW'
+    -> end as Assigned_Team_Type
+    -> from tickets;
++-----------+---------------+------------+----------+-----------+--------------+---------------+---------------+--------------------+
+| ticket_id | customer_name | issue_type | priority | status    | created_date | assigned_team | location      | Assigned_Team_Type |
++-----------+---------------+------------+----------+-----------+--------------+---------------+---------------+--------------------+
+|         1 | Alice         | Network    |        3 | Open      | 2025-08-01   | Network Team  | New York      | NW                 |
+|         2 | Bob           | Software   |        2 | Closed    | 2025-07-28   | Software Team | Chicago       | SW                 |
+|         3 | Charlie       | Hardware   |        1 | Pending   | 2025-08-02   | Hardware Team | San Francisco | HR                 |
+|         4 | Diana         | Network    |        2 | Open      | 2025-08-03   | Network Team  | New York      | NW                 |
+|         5 | Eve           | Software   |        3 | Closed    | 2025-07-30   | Software Team | Boston        | SW                 |
+|         6 | Frank         | Software   |        1 | Pending   | 2025-08-04   | Software Team | Seattle       | SW                 |
+|         7 | Grace         | Network    |        2 | Escalated | 2025-08-05   | Network Team  | Los Angeles   | NW                 |
+|         8 | Henry         | Hardware   |        3 | Open      | 2025-08-01   | Hardware Team | Houston       | HR                 |
+|         9 | Ivy           | Network    |        1 | Closed    | 2025-07-29   | Network Team  | Chicago       | NW                 |
+|        10 | Jack          | Software   |        3 | Open      | 2025-08-06   | Software Team | New York      | SW                 |
+|        11 | Kate          | Hardware   |        2 | Pending   | 2025-08-02   | Hardware Team | Boston        | HR                 |
+|        12 | Leo           | Software   |        2 | Closed    | 2025-07-31   | Software Team | San Francisco | SW                 |
+|        13 | Mona          | Network    |        3 | Escalated | 2025-08-03   | Network Team  | New York      | NW                 |
+|        14 | Nina          | Hardware   |        1 | Open      | 2025-08-04   | Hardware Team | Seattle       | HR                 |
+|        15 | Oscar         | Software   |        3 | Pending   | 2025-08-01   | Software Team | Los Angeles   | SW                 |
+|        16 | Paul          | Network    |        2 | Closed    | 2025-07-30   | Network Team  | Houston       | NW                 |
+|        17 | Queen         | Hardware   |        1 | Pending   | 2025-08-05   | Hardware Team | New York      | HR                 |
+|        18 | Rita          | Software   |        2 | Open      | 2025-08-06   | Software Team | Chicago       | SW                 |
+|        19 | Sam           | Network    |        3 | Open      | 2025-08-07   | Network Team  | Boston        | NW                 |
+|        20 | Tina          | Hardware   |        2 | Escalated | 2025-08-02   | Hardware Team | Seattle       | HR                 |
++-----------+---------------+------------+----------+-----------+--------------+---------------+---------------+--------------------+
+________________________________________
+✅ 18. Get average priority per issue type
+select issue_type,avg(priority) from tickets group by issue_type;
++------------+---------------+
+| issue_type | avg(priority) |
++------------+---------------+
+| Network    |        2.2857 |
+| Software   |        2.2857 |
+| Hardware   |        1.6667 |
++------------+---------------+
+________________________________________
+✅ 19. Show only 'Software' tickets with extra labels: 'High Risk', 'Normal', etc.
+select *,case
+    -> when issue_type='Software' and priority='3' then 'High risk'
+    -> when issue_type='Software' and priority='2' then 'Normal'
+    -> when issue_type='Software' and priority='1' then 'low'
+    -> else 'null'
+    -> end as extra_lables
+    -> from tickets;
++-----------+---------------+------------+----------+-----------+--------------+---------------+---------------+--------------+
+| ticket_id | customer_name | issue_type | priority | status    | created_date | assigned_team | location      | extra_lables |
++-----------+---------------+------------+----------+-----------+--------------+---------------+---------------+--------------+
+|         1 | Alice         | Network    |        3 | Open      | 2025-08-01   | Network Team  | New York      | null         |
+|         2 | Bob           | Software   |        2 | Closed    | 2025-07-28   | Software Team | Chicago       | Normal       |
+|         3 | Charlie       | Hardware   |        1 | Pending   | 2025-08-02   | Hardware Team | San Francisco | null         |
+|         4 | Diana         | Network    |        2 | Open      | 2025-08-03   | Network Team  | New York      | null         |
+|         5 | Eve           | Software   |        3 | Closed    | 2025-07-30   | Software Team | Boston        | High risk    |
+|         6 | Frank         | Software   |        1 | Pending   | 2025-08-04   | Software Team | Seattle       | low          |
+|         7 | Grace         | Network    |        2 | Escalated | 2025-08-05   | Network Team  | Los Angeles   | null         |
+|         8 | Henry         | Hardware   |        3 | Open      | 2025-08-01   | Hardware Team | Houston       | null         |
+|         9 | Ivy           | Network    |        1 | Closed    | 2025-07-29   | Network Team  | Chicago       | null         |
+|        10 | Jack          | Software   |        3 | Open      | 2025-08-06   | Software Team | New York      | High risk    |
+|        11 | Kate          | Hardware   |        2 | Pending   | 2025-08-02   | Hardware Team | Boston        | null         |
+|        12 | Leo           | Software   |        2 | Closed    | 2025-07-31   | Software Team | San Francisco | Normal       |
+|        13 | Mona          | Network    |        3 | Escalated | 2025-08-03   | Network Team  | New York      | null         |
+|        14 | Nina          | Hardware   |        1 | Open      | 2025-08-04   | Hardware Team | Seattle       | null         |
+|        15 | Oscar         | Software   |        3 | Pending   | 2025-08-01   | Software Team | Los Angeles   | High risk    |
+|        16 | Paul          | Network    |        2 | Closed    | 2025-07-30   | Network Team  | Houston       | null         |
+|        17 | Queen         | Hardware   |        1 | Pending   | 2025-08-05   | Hardware Team | New York      | null         |
+|        18 | Rita          | Software   |        2 | Open      | 2025-08-06   | Software Team | Chicago       | Normal       |
+|        19 | Sam           | Network    |        3 | Open      | 2025-08-07   | Network Team  | Boston        | null         |
+|        20 | Tina          | Hardware   |        2 | Escalated | 2025-08-02   | Hardware Team | Seattle       | null         |
++-----------+---------------+------------+----------+-----------+--------------+---------------+---------------+--------------+
+________________________________________
+✅ 20. Display ticket_id, issue_type, and a comment:
+•	'Needs Attention' if Escalated or Pending
+•	'Resolved' if Closed
+•	'In Progress' otherwise
+select *,case
+    -> when status='escalated' or status='Pending' then 'Needs Attention'
+    -> when status='closed' then 'Resolved'
+    -> else 'in progress'
+    -> end as updated_comment
+    -> from tickets;
++-----------+---------------+------------+----------+-----------+--------------+---------------+---------------+-----------------+
+| ticket_id | customer_name | issue_type | priority | status    | created_date | assigned_team | location      | updated_comment |
++-----------+---------------+------------+----------+-----------+--------------+---------------+---------------+-----------------+
+|         1 | Alice         | Network    |        3 | Open      | 2025-08-01   | Network Team  | New York      | in progress     |
+|         2 | Bob           | Software   |        2 | Closed    | 2025-07-28   | Software Team | Chicago       | Resolved        |
+|         3 | Charlie       | Hardware   |        1 | Pending   | 2025-08-02   | Hardware Team | San Francisco | Needs Attention |
+|         4 | Diana         | Network    |        2 | Open      | 2025-08-03   | Network Team  | New York      | in progress     |
+|         5 | Eve           | Software   |        3 | Closed    | 2025-07-30   | Software Team | Boston        | Resolved        |
+|         6 | Frank         | Software   |        1 | Pending   | 2025-08-04   | Software Team | Seattle       | Needs Attention |
+|         7 | Grace         | Network    |        2 | Escalated | 2025-08-05   | Network Team  | Los Angeles   | Needs Attention |
+|         8 | Henry         | Hardware   |        3 | Open      | 2025-08-01   | Hardware Team | Houston       | in progress     |
+|         9 | Ivy           | Network    |        1 | Closed    | 2025-07-29   | Network Team  | Chicago       | Resolved        |
+|        10 | Jack          | Software   |        3 | Open      | 2025-08-06   | Software Team | New York      | in progress     |
+|        11 | Kate          | Hardware   |        2 | Pending   | 2025-08-02   | Hardware Team | Boston        | Needs Attention |
+|        12 | Leo           | Software   |        2 | Closed    | 2025-07-31   | Software Team | San Francisco | Resolved        |
+|        13 | Mona          | Network    |        3 | Escalated | 2025-08-03   | Network Team  | New York      | Needs Attention |
+|        14 | Nina          | Hardware   |        1 | Open      | 2025-08-04   | Hardware Team | Seattle       | in progress     |
+|        15 | Oscar         | Software   |        3 | Pending   | 2025-08-01   | Software Team | Los Angeles   | Needs Attention |
+|        16 | Paul          | Network    |        2 | Closed    | 2025-07-30   | Network Team  | Houston       | Resolved        |
+|        17 | Queen         | Hardware   |        1 | Pending   | 2025-08-05   | Hardware Team | New York      | Needs Attention |
+|        18 | Rita          | Software   |        2 | Open      | 2025-08-06   | Software Team | Chicago       | in progress     |
+|        19 | Sam           | Network    |        3 | Open      | 2025-08-07   | Network Team  | Boston        | in progress     |
+|        20 | Tina          | Hardware   |        2 | Escalated | 2025-08-02   | Hardware Team | Seattle       | Needs Attention |
++-----------+---------------+------------+----------+-----------+--------------+---------------+---------------+-----------------+
+________________________________________
+
